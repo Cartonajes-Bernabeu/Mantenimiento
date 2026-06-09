@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Mantenimiento</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen flex items-center justify-center p-2 sm:p-4">
+
+    <div id="pantalla-bloqueo" class="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md w-full border border-gray-700">
+        <div class="text-center mb-6">
+            <span class="text-4xl">🔐</span>
+            <h2 class="text-2xl font-bold mt-2">Acceso Restringido</h2>
+            <p class="text-gray-400 text-sm mt-1">Introduce la clave para acceder a Mantenimiento</p>
+        </div>
+        <input type="password" id="clave" placeholder="Contraseña" 
+               class="w-full p-3 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:border-blue-500 mb-4 text-center text-lg">
+        <button onclick="desbloquearYDesencriptar()" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition duration-200">
+            Desencriptar y Entrar
+        </button>
+        <p id="error-msg" class="text-red-500 text-center text-sm mt-3 hidden">❌ Contraseña incorrecta o archivo dañado.</p>
+    </div>
+
+    <div id="contenido-web" class="w-[98vw] max-w-[98%] bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-700 hidden my-2 mx-auto">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
+            <div>
+                <h1 class="text-2xl font-bold text-blue-400">🛠️ Panel de Mantenimiento</h1>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <label for="selector-hojas" class="text-sm font-medium text-gray-300">Ver Hoja:</label>
+                <select id="selector-hojas" onchange="cambiarHoja(this.value)" 
+                        class="bg-gray-700 border border-gray-600 text-white p-2 rounded focus:outline-none focus:border-blue-500 text-sm">
+                </select>
+                <button onclick="window.location.reload()" class="ml-4 bg-red-600 hover:bg-red-700 text-xs py-2 px-3 rounded text-white font-medium transition">Cerrar Sesión</button>
+            </div>
+        </div>
+
+        <div id="filtros-gantt" class="hidden flex flex-wrap gap-6 mb-4 p-4 bg-gray-750 rounded-lg border border-gray-600 bg-gray-700">
+            <div>
+                <label class="block text-xs font-bold text-gray-300 mb-1 uppercase tracking-wide">👨‍🔧 Operario</label>
+                <select id="filtro-operario" onchange="aplicarFiltrosGantt()" class="bg-gray-800 text-white border border-gray-600 p-2 rounded text-sm w-48 focus:border-blue-500 outline-none">
+                    <option value="TODOS">Todos los operarios</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-300 mb-1 uppercase tracking-wide">📅 Mes de inicio</label>
+                <input type="month" id="filtro-fecha" onchange="aplicarFiltrosGantt()" class="bg-gray-800 text-white border border-gray-600 p-2 rounded text-sm focus:border-blue-500 outline-none">
+            </div>
+            <div class="flex items-end">
+                <button onclick="limpiarFiltros()" class="text-sm text-blue-400 hover:text-blue-300 underline mb-2">Limpiar filtros</button>
+            </div>
+        </div>
+
+        <div id="contenedor-gantt" class="hidden bg-white p-4 rounded-lg overflow-x-auto border border-gray-700 w-full" style="min-height: 500px;">
+            <div id="chart_div" style="width: 100%; min-height: 450px;"></div>
+        </div>
+
+        <div id="contenedor-tabla" class="overflow-x-auto rounded-lg border border-gray-700 max-h-[75vh]">
+            <table class="min-w-full divide-y divide-gray-700 text-left text-sm">
+                <thead class="bg-gray-700 text-gray-200 uppercase font-semibold sticky top-0" id="tabla-cabecera"></thead>
+                <tbody class="divide-y divide-gray-700 bg-gray-800" id="tabla-cuerpo"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
